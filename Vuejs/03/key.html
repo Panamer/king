@@ -6,9 +6,27 @@
   <title>key的作用和原理</title>
 </head>
 <body>
-  <script src="../vue-dev/dist/vue.js"></script>
+  <div id="app">
+    <div v-for="item in items" :key="item">
+      {{ item }}
+    </div>
+  </div>
+  对比发现 没有key时会影响diff判断。
+  相同的节点不应该做任何操作 却执行了nodeOps.setTextContent(elm, vnode.text)
+  
+  <script src="../../dist/vue.js"></script>
   <script>
-    
+    const app = new Vue({
+      el: "#app",
+      data: {
+        items: ['a', 'b', 'c', 'd', 'f']
+      },
+      mounted() {
+        setTimeout(() => {
+          this.items.splice(1, 1, 'e')
+        },2000)
+      }
+    })
   </script>
 </body>
 </html>
