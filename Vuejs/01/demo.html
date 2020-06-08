@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>v-if和v-for 优先级</title>
+</head>
+<body>
+  <script src="../vue-dev/dist/vue.js"></script>
+  <div id="app">
+    <p v-for="book in books" v-if="isShow">
+      {{ book.title }}
+    </p>
+    <h6>此时的渲染函数是这样的</h6>
+    <code>
+      ƒ anonymous(
+      ) {
+      with(this){return _c('div',{attrs:{"id":"app"}},_l((bookList),function(book)
+      {return (book.isSale)?_c('p',[_v("\n      "+_s(book.title)+"\n    ")]):_e()}),0)}
+      }
+    </code>
+
+    <p v-for="book in bookList" :key="book.title">
+      {{ book.title }}
+    </p>
+    <h5>此时的渲染函数是这样的</h5>
+    <code>
+      (function anonymous(
+      ) {
+      with(this){return _c('div',{attrs:{"id":"app"}},[_l((bookList),function(book)
+      {return _c('p',{key:book.title},[_v("\n      "+_s(book.title)+"\n    ")])}),_v(" "),_c('h5',[_v("此时的渲染函数是这样的")])],2)}
+      })
+    </code>
+  </div>
+
+  <script>
+    const vm = new Vue({
+      el: "#app",
+      data() {
+        return {
+          books: [
+            {title: "html css", isSale: false},
+            {title: "javascript", isSale: true},
+            {title: "Node js", isSale: true}
+          ]
+        }
+      },
+      computed: {
+        bookList() {
+          return this.books.filter((item) => item.isSale);
+        },
+        isShow() {
+          return this.books.length > 0
+        }
+      },
+
+    })
+    console.log(vm.$options.render);
+    
+  </script>
+</body>
+</html>
