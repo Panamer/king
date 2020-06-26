@@ -1,8 +1,9 @@
 <template>
   <div id="app">
     <div id="nav">
+      <router-link to="/globalApi">globalApi</router-link> |
       <router-link to="/props">Props</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/about">extend</router-link>
     </div>
     <router-view/>
   </div>

@@ -1,6 +1,9 @@
+import Vue from 'vue'
 import Vuex from 'vuex'
 
-export default Vuex.createStore({
+Vue.use(Vuex)
+
+export default new Vuex.Store({
   state: {
   },
   mutations: {
@@ -9,4 +12,4 @@ export default Vuex.createStore({
   },
   modules: {
   }
-});
+})
