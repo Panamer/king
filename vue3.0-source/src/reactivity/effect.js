@@ -1,60 +1,68 @@
 import { TriggerOpTypes } from "./operation";
 
-export function effect(fn, options = {}) { // watchEffect
-    const effect = createReactiveEffect(fn, options);
-    if (!options.lazy) { // 后续可能有lazy的情况
-        effect(); // 默认就要执行
+/**
+ * 创建effect时可以传递参数 computed也是基于effect来实现的,只是增加了一些参数
+ * @param {*} fn 用户定义的方法
+ * @param {*} options 条件
+ * 这里写的是个watchEffect
+ */
+export function effect(fn, options = {}){
+    const effect = createReactiveEffect(fn, options)
+    if (!options.lazy) {
+        effect() // watcheffect默认就执行. 当是计算属性effect的时候默认不执行
     }
     return effect;
 }
-// 创建响应式的effect
+
 let uid = 0;
-let activeEffect;
-const effectStack = []; // 栈结构
-function createReactiveEffect(fn, options) {
-    const effect = function reactiveEffect() {
-        if (!effectStack.includes(effect)) { // 防止不停的更改属性导致死循环
+let activeEffect = null; // 当前新创建的effect
+const effectStack = []; // 栈结构 存放正在执行的effect
+function createReactiveEffect(fn, options){
+    const effect = function reactiveEffect(){
+        if (!effectStack.includes(effect)) {    // 防止不听的更改属性导致死循环
             try {
-                effectStack.push(effect);
-                activeEffect = effect; // 将effect放到了 activeEffect上
-                return fn();
+                effectStack.push(effect);   // 将当前effect放到栈中
+                activeEffect = effect;  // 标记当前运行的effect
+                return fn();    // 执行fn
             } finally {
-                effectStack.pop(); // vue2
-                activeEffect = effectStack[effectStack.length - 1];
+                effectStack.pop();  // 执行完出栈
+                activeEffect = effectStack[effectStack.length - 1]; // vue2.0
             }
         }
     }
+
     effect.options = options;
     effect.id = uid++;
     effect.deps = []; // 依赖了哪些属性
-    // todo...
+
     return effect;
 }
-const targetMap = new WeakMap(); //用法和map一致  但是弱引用 不会导致内存泄漏
-export function track(target, type, key) { // a = [effect,effect]  b = [effect]
-    if (activeEffect == undefined) {
-        return; // 说明取值的属性 不依赖于 effect
-    }
-    let depsMap = targetMap.get(target); // 根据key 来进行取值
 
+// 和map用法一致 但是弱引用 不会导致内存泄漏
+const targetMap = new WeakMap();
+// 依赖收集
+export function track(target,key){
+    if (!activeEffect) {
+        return;  // 说明取值的属性 不依赖effect
+    }
+    let depsMap = targetMap.get(target);
     if (!depsMap) {
         targetMap.set(target, (depsMap = new Map()))
     }
     let dep = depsMap.get(key);
     if (!dep) {
-        depsMap.set(key, (dep = new Set()));
+        depsMap.set(key, (dep = new Set));
     }
     if (!dep.has(activeEffect)) {
-        dep.add(activeEffect); // { "{name:'zf'}":{name:set(effect)}  }
-        // activeEffect.deps.push(dep); // 让这个effect 记录dep属性
+        dep.add( );
     }
 }
-export function trigger(target, type, key, value, oldValue) {
-    const depsMap = targetMap.get(target); // 获取当前对应的map
+// 触发依赖更新
+export function trigger(target, type, key, value, oldValue){
+    const depsMap = targetMap.get(target)
     if (!depsMap) {
         return;
     }
-    // 计算属性要优先于effect执行
     const effects = new Set();
     const computedRunners = new Set();
 
@@ -70,17 +78,13 @@ export function trigger(target, type, key, value, oldValue) {
         }
     }
 
-    // const run = (effects) => {
-    //     if (effects) {
-    //         effects.forEach(effect => effect())
-    //     }
-    // }
-    if (key !== null) { // arr.push(4) [1,2,3    , 4]   push length
+    if (key !== null) {
         add(depsMap.get(key));
     }
-    if (type === TriggerOpTypes.ADD) { // 对数组新增属性 会触发length 对应的依赖 在取值的时候回对length属性进行依赖收集
-        add(depsMap.get(Array.isArray(target) ? 'length' : ''));
+    if (type === TriggerOpTypes.ADD) {
+        add(depsMap.get(Array.isArray(target) ? 'length' : ''))
     }
+
     const run = (effect) => {
         if (effect.options.scheduler) {
             effect.options.scheduler();
@@ -88,6 +92,7 @@ export function trigger(target, type, key, value, oldValue) {
             effect();
         }
     }
+    // 计算属性优先于effect执行
     computedRunners.forEach(run);
     effects.forEach(run);
 }
