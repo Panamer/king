@@ -27,17 +27,18 @@ function createGetter(){
  */
 
 function createSetter() {
-    return function set(target, key, receiver){
+    return function set(target, key, value, receiver){
         // 设置值的时候需要判断是修改属性还是新增属性.如果是修改属性且value和原来的值一样 什么都不做
         const hadkey = hasOwn(target, key);
         const oldValue = target[key];
         const res = Reflect.set(target, key, value, receiver);
-
+        console.log("set 设置值");
         if (!hadkey) {
             // 新增
             trigger(target, TriggerOpTypes.ADD, key, value);
         } else if(hasChanged(value, oldValue)) {
             // 修改
+            console.log('修改操作', value, oldValue);
             trigger(target, TriggerOpTypes.SET, key, value, oldValue)
         }
         // 值没有变化 什么都不用做

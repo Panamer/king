@@ -60,6 +60,7 @@ export function track(target,key){
 // 触发依赖更新
 export function trigger(target, type, key, value, oldValue){
     const depsMap = targetMap.get(target)
+    // console.log(depsMap);
     if (!depsMap) {
         return;
     }

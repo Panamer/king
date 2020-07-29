@@ -10,6 +10,7 @@ export function reactive(target){
     if (!isObject(target)) {
         return target;
     }
+    console.log("数据响应式");
     // 创建一个响应式对象 proxy不同于defineProperty  它有返回值
     const observed = new Proxy(target, mutableHandler)
     return observed;
