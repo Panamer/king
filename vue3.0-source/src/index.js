@@ -4,17 +4,23 @@ import { reactive, ref, computed, effect } from './reactivity'
 const state = reactive({
     name: '前端大镖客',
     age: '500',
-    brothers:['java', 'python']
+    brothers: ['java', 'python']
 })
 
-
+const doubleAge = computed(() => state.age * 2)
 
 
 effect(() => {
-    document.body.innerHTML = state.name;
+    document.body.innerHTML = `my name is ${state.name}, doubleAge is ${doubleAge.value}`;
 })
 
-state.name = "前端菜鸟"
+// effect(() => {
+//     document.body.innerHTML = `my name is ${state.name}, doubleAge is ${doubleAge}`;
+// })
+
+// state.name = "前端菜鸟"
+
+
 
 
 // 写完reactive  effect
@@ -23,3 +29,7 @@ state.name = "前端菜鸟"
 // activeEffect为undefined  depsMap也是undefined
 
 // 自定义effect默认会执行一次,当数据变化会再次被调用  更新视图
+
+// watchEffect 和 effect 的区别: 
+// effect是先记住这个依赖 不会立即执行 待值发生改变时 执行
+// watchEffect是 初始化就会执行一次 待值发生改变时 还会执行
