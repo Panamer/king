@@ -32,7 +32,7 @@ function createSetter() {
         const hadkey = hasOwn(target, key);
         const oldValue = target[key];
         const res = Reflect.set(target, key, value, receiver);
-        console.log("set 设置值");
+        console.log("set 设置值", value);
         if (!hadkey) {
             // 新增
             trigger(target, TriggerOpTypes.ADD, key, value);

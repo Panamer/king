@@ -41,7 +41,7 @@ function createReactiveEffect(fn, options){
 // 和map用法一致 但是弱引用 不会导致内存泄漏
 const targetMap = new WeakMap();
 // 依赖收集
-export function track(target,key){
+export function track(target, type, key){
     if (!activeEffect) {
         return;  // 说明取值的属性 不依赖effect
     }
@@ -54,13 +54,13 @@ export function track(target,key){
         depsMap.set(key, (dep = new Set));
     }
     if (!dep.has(activeEffect)) {
-        dep.add( );
+        dep.add( activeEffect );
+        activeEffect.deps.push(dep)
     }
 }
 // 触发依赖更新
 export function trigger(target, type, key, value, oldValue){
     const depsMap = targetMap.get(target)
-    // console.log(depsMap);
     if (!depsMap) {
         return;
     }
