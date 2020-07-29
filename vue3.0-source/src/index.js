@@ -14,6 +14,7 @@ effect(() => {
     document.body.innerHTML = `my name is ${state.name}, doubleAge is ${doubleAge.value}`;
 })
 
+console.log(ref(9));
 // effect(() => {
 //     document.body.innerHTML = `my name is ${state.name}, doubleAge is ${doubleAge}`;
 // })
