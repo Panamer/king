@@ -9,7 +9,13 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
-  }
+  },
+  computed: {
+    msgAsync() {
+      return setTimeout(
+        () => { return msg + 90} , 0)
+    }
+  },
 }
 </script>
 
